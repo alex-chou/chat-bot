@@ -11,8 +11,8 @@ import (
 var (
 	// environment the server is running in
 	environment = "development"
-	// serverPort to listen to
-	serverPort = "8000"
+	// port to listen to
+	port = "8000"
 )
 
 func main() {
@@ -22,17 +22,17 @@ func main() {
 		environment = e
 	}
 
-	if sp := os.Getenv("SERVER_PORT"); sp == "" {
-		log.Printf("SERVER_PORT not set. Using: %s", serverPort)
+	if p := os.Getenv("PORT"); p == "" {
+		log.Printf("PORT not set. Using: %s", port)
 	} else {
-		serverPort = sp
+		port = p
 	}
-
-	log.Printf("Running chatbot in %s on port %s", environment, serverPort)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/test", handler)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", serverPort), mux))
+
+	log.Printf("Running chatbot in %s on port %s", environment, port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), mux))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
