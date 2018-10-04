@@ -14,7 +14,11 @@ test:
 
 heroku_push: build test
 	# Build and run tests locally before pushing to heroku.
+ifneq ($(shell git rev-parse --abbrev-ref HEAD), master)
+	$(error Not on branch master)
+else
 	git push heroku master
+endif
 
 heroku_logs:
 	# Tail logs on chatbot heroku app.
