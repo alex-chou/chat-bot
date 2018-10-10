@@ -18,6 +18,7 @@ const (
 type Server struct {
 	*http.ServeMux
 	backend backend.Backend
+	Token   string
 }
 
 // NewServer creates a new server.
@@ -26,7 +27,10 @@ func NewServer(backend backend.Backend) *Server {
 		ServeMux: http.NewServeMux(),
 		backend:  backend,
 	}
+
 	server.Handle("/health", NewWrappedHandler(http.MethodGet, server.Health))
+	server.Handle("/supamonkey_slack", NewWrappedHandler(http.MethodPost, server.Slack))
+
 	return server
 }
 

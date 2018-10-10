@@ -26,6 +26,7 @@ func main() {
 	slack := configureSlack()
 	backend := configureBackend(slack)
 	server := configureServer(backend)
+	server.Token = os.Getenv("SLACK_TOKEN")
 
 	log.Printf("Running chatbot in %s on port %s", environment, port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), server))
