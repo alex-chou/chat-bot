@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/alex-chou/hangouts-chat-bot/internal/server"
+	"github.com/alex-chou/chat-bot/internal/server"
 )
 
 var (
