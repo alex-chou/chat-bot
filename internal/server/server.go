@@ -22,21 +22,21 @@ func NewServer() *Server {
 	server := &Server{
 		ServeMux: http.NewServeMux(),
 	}
-	server.HandleFunc(http.MethodGet, "/health", server.Health)
+	server.Handle("/health", NewWrappedHandler(http.MethodGet, server.Health))
 	return server
 }
 
-// HandleFunc wraps the handler and passes it to the embedded ServeMux.
-func (s *Server) HandleFunc(method, pattern string, handler func(http.ResponseWriter, *http.Request)) {
+// NewWrappedHandler wraps the handler and passes it to the embedded ServeMux.
+func NewWrappedHandler(method string, handler func(http.ResponseWriter, *http.Request)) http.Handler {
 	wrappedHandler := http.Handler(http.HandlerFunc(handler))
-	wrappedHandler = MethodHandler(method, wrappedHandler)
+	wrappedHandler = NewMethodHandler(method, wrappedHandler)
 	wrappedHandler = http.TimeoutHandler(wrappedHandler, timeoutDuration, timeoutMessage)
-	s.ServeMux.Handle(pattern, wrappedHandler)
+	return wrappedHandler
 }
 
-// MethodHandler invokes the input handler iff the request method matches the
+// NewMethodHandler invokes the input handler iff the request method matches the
 // input method.
-func MethodHandler(method string, handler http.Handler) http.Handler {
+func NewMethodHandler(method string, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == method {
 			handler.ServeHTTP(w, r)
