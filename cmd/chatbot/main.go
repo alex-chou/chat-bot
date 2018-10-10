@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"html"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/alex-chou/chat-bot/internal/server"
 )
 
 var (
@@ -16,6 +17,17 @@ var (
 )
 
 func main() {
+	if err := readConfig(); err != nil {
+		log.Fatal(err)
+	}
+
+	server := configureServer()
+
+	log.Printf("Running chatbot in %s on port %s", environment, port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), server))
+}
+
+func readConfig() error {
 	if e := os.Getenv("ENVIRONMENT"); e == "" {
 		log.Printf("ENVIRONMENT not set. Using: %s", environment)
 	} else {
@@ -27,14 +39,9 @@ func main() {
 	} else {
 		port = p
 	}
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/test", handler)
-
-	log.Printf("Running chatbot in %s on port %s", environment, port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), mux))
+	return nil
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+func configureServer() *server.Server {
+	return server.NewServer()
 }
