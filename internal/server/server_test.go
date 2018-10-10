@@ -5,12 +5,24 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/alex-chou/chat-bot/internal/backend/backendmocks"
 	"github.com/stretchr/testify/assert"
 )
 
+type mocks struct {
+	backend *backendmocks.Backend
+}
+
+func initialize() (*Server, *mocks) {
+	backend := new(backendmocks.Backend)
+	return NewServer(backend), &mocks{
+		backend: backend,
+	}
+}
+
 func TestNewMethodHandler(t *testing.T) {
 	assert := assert.New(t)
-	server := NewServer()
+	server, _ := initialize()
 	handler := NewWrappedHandler(http.MethodGet, server.Health)
 
 	t.Run("correct method", func(t *testing.T) {

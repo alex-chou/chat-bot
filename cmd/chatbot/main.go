@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/alex-chou/chat-bot/internal/backend"
 	"github.com/alex-chou/chat-bot/internal/server"
 	"github.com/alex-chou/chat-bot/pkg/slack"
 )
@@ -22,7 +23,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := configureServer()
+	slack := configureSlack()
+	backend := configureBackend(slack)
+	server := configureServer(backend)
 
 	log.Printf("Running chatbot in %s on port %s", environment, port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), server))
@@ -51,6 +54,10 @@ func configureSlack() slack.Slack {
 	return slack.New(token)
 }
 
-func configureServer() *server.Server {
-	return server.NewServer(configureSlack())
+func configureServer(backend backend.Backend) *server.Server {
+	return server.NewServer(backend)
+}
+
+func configureBackend(slack slack.Slack) backend.Backend {
+	return backend.NewBackend(slack)
 }
