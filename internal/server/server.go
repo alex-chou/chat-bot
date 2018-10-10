@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 	"time"
+
+	"github.com/alex-chou/chat-bot/pkg/slack"
 )
 
 const (
@@ -15,12 +17,14 @@ const (
 // Server is a chatbot server.
 type Server struct {
 	*http.ServeMux
+	slack slack.Slack
 }
 
 // NewServer creates a new server.
-func NewServer() *Server {
+func NewServer(slack slack.Slack) *Server {
 	server := &Server{
 		ServeMux: http.NewServeMux(),
+		slacke:   slack,
 	}
 	server.Handle("/health", NewWrappedHandler(http.MethodGet, server.Health))
 	return server

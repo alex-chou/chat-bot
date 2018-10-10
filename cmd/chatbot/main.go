@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/alex-chou/chat-bot/internal/server"
+	"github.com/alex-chou/chat-bot/pkg/slack"
 )
 
 var (
@@ -42,6 +43,14 @@ func readConfig() error {
 	return nil
 }
 
+func configureSlack() slack.Slack {
+	token := os.Getenv("SLACK_TOKEN")
+	if token == "" {
+		log.Fatal("SLACK_TOKEN not set")
+	}
+	return slack.New(token)
+}
+
 func configureServer() *server.Server {
-	return server.NewServer()
+	return server.NewServer(configureSlack())
 }
